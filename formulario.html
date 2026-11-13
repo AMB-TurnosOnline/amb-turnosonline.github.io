@@ -240,12 +240,16 @@
         <path d="M4 12.5L9.5 18L20 6" stroke="#f2ede2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <h2>¡Casi listo!</h2>
-    <p>Para asegurar tu lugar, tocá el botón para enviar tu confirmación por WhatsApp.</p>
-    
-    <a href="#" id="btn-wa-link" target="_blank" class="btn-whatsapp-confirm">
-      Confirmar por WhatsApp 💬
-    </a>
+    <h2>¡Turno confirmado!</h2>
+    <p>Tu reserva quedó registrada correctamente en AMB BARBERS. Estos son los datos de tu turno:</p>
+    <div class="confirm-details" style="text-align:left;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:18px 0 8px;font-size:14px;line-height:1.8">
+      <div><strong>Nombre:</strong> <span id="confirm-nombre"></span></div>
+      <div><strong>Barbero:</strong> <span id="confirm-barbero"></span></div>
+      <div><strong>Servicio:</strong> <span id="confirm-servicio"></span></div>
+      <div><strong>Fecha:</strong> <span id="confirm-fecha"></span></div>
+      <div><strong>Horario:</strong> <span id="confirm-horario"></span></div>
+    </div>
+    <p>¡Te esperamos! Si necesitás modificar tu turno, comunicate con AMB BARBERS.</p>
     <button type="button" class="btn-secondary" id="confirm-close">Cerrar ventana</button>
   </div>
 </div>
@@ -460,9 +464,15 @@
       status.className='';
       status.textContent='';
       
-      // Armar el link de WhatsApp dinámico
-      const textoMensaje = encodeURIComponent(`Hola! Acabo de sacar un turno desde la web a nombre de ${nombreCliente} para el día ${diaElegido} a las ${horaElegida} hs.`);
-      document.getElementById('btn-wa-link').href = `https://wa.me/${NUMERO_WHATSAPP_BOT}?text=${textoMensaje}`;
+      // Mostrar los datos del turno confirmado en la página, sin depender de WhatsApp.
+      const barberoElegido = BARBEROS.find(b => b.id === data.barbero);
+      const servicioElegidoReserva = SERVICIOS.find(s => s.id === data.servicio);
+      const fechaConfirmada = new Date(data.dia + 'T00:00:00');
+      document.getElementById('confirm-nombre').textContent = data.nombre;
+      document.getElementById('confirm-barbero').textContent = barberoElegido ? barberoElegido.nombre : data.barbero;
+      document.getElementById('confirm-servicio').textContent = servicioElegidoReserva ? servicioElegidoReserva.nombre : data.servicio;
+      document.getElementById('confirm-fecha').textContent = fechaConfirmada.toLocaleDateString('es-AR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+      document.getElementById('confirm-horario').textContent = data.horario + ' hs';
 
       form.reset();
       horarioPick.innerHTML = '<span class="time-empty">Elegí un día primero</span>';
