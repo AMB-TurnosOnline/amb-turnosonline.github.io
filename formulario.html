@@ -137,6 +137,9 @@
   }
   .confirm-card .btn-secondary{width:100%;margin-top:10px;border:0;cursor:pointer;font-family:inherit;font-size:14px;background:transparent;color:var(--fg-dim)}
   [hidden]{display:none !important}
+  .ayuda-campo{display:block;margin-top:6px;color:var(--fg-dim);font-size:12px}
+  .check-consentimiento{display:flex;gap:12px;align-items:flex-start;text-transform:none;letter-spacing:0;font-size:13px;line-height:1.5;margin-bottom:0;cursor:pointer}
+  .check-consentimiento input{width:20px;height:20px;padding:0;margin:2px 0 0;flex-shrink:0;accent-color:#f2ede2}
   .consulta-panel{border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:26px}
   .consulta-panel p{color:var(--fg-dim);font-size:14px;line-height:1.6;margin:0 0 16px}
   .consulta-panel p b{color:var(--fg)}
@@ -170,6 +173,7 @@
     <fieldset class="campo-reserva">
       <label for="whatsapp">Tu WhatsApp</label>
       <input type="tel" id="whatsapp" name="whatsapp" required placeholder="264 xxx xxxx">
+      <small class="ayuda-campo">Usá tu propio número: es el que va a recibir la confirmación del turno.</small>
     </fieldset>
 
     <fieldset class="campo-reserva">
@@ -201,6 +205,13 @@
       <p>Este servicio dura unas <b>4 horas</b> y el barbero primero charla con vos para definir qué te vas a hacer. Por eso <b>se coordina directo por WhatsApp</b>, sin reservar acá.</p>
       <a id="consulta-btn" class="btn btn-primary" href="#" target="_blank" rel="noopener">Hablar por WhatsApp</a>
     </div>
+
+    <fieldset class="campo-reserva">
+      <label class="check-consentimiento">
+        <input type="checkbox" id="acepta-whatsapp" required>
+        <span>Confirmo que este número de WhatsApp es mío y acepto recibir mensajes de AMB Barbers sobre mi turno (confirmación y recordatorio).</span>
+      </label>
+    </fieldset>
 
     <button type="submit" class="btn btn-primary campo-reserva">Confirmar reserva</button>
     <div id="status" class="campo-reserva"></div>
@@ -240,16 +251,12 @@
         <path d="M4 12.5L9.5 18L20 6" stroke="#f2ede2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <h2>¡Turno confirmado!</h2>
-    <p>Tu reserva quedó registrada correctamente en AMB BARBERS. Estos son los datos de tu turno:</p>
-    <div class="confirm-details" style="text-align:left;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:18px 0 8px;font-size:14px;line-height:1.8">
-      <div><strong>Nombre:</strong> <span id="confirm-nombre"></span></div>
-      <div><strong>Barbero:</strong> <span id="confirm-barbero"></span></div>
-      <div><strong>Servicio:</strong> <span id="confirm-servicio"></span></div>
-      <div><strong>Fecha:</strong> <span id="confirm-fecha"></span></div>
-      <div><strong>Horario:</strong> <span id="confirm-horario"></span></div>
-    </div>
-    <p>¡Te esperamos! Si necesitás modificar tu turno, comunicate con AMB BARBERS.</p>
+    <h2>¡Casi listo!</h2>
+    <p>Para asegurar tu lugar, tocá el botón para enviar tu confirmación por WhatsApp.</p>
+    
+    <a href="#" id="btn-wa-link" target="_blank" class="btn-whatsapp-confirm">
+      Confirmar por WhatsApp 💬
+    </a>
     <button type="button" class="btn-secondary" id="confirm-close">Cerrar ventana</button>
   </div>
 </div>
@@ -445,6 +452,7 @@
     const data = {
       nombre: nombreCliente,
       whatsapp: document.getElementById('whatsapp').value,
+      aceptaWhatsapp: document.getElementById('acepta-whatsapp').checked,
       barbero: form.barbero.value,
       servicio: servicioSel.value,
       dia: diaElegido,
@@ -464,15 +472,9 @@
       status.className='';
       status.textContent='';
       
-      // Mostrar los datos del turno confirmado en la página, sin depender de WhatsApp.
-      const barberoElegido = BARBEROS.find(b => b.id === data.barbero);
-      const servicioElegidoReserva = SERVICIOS.find(s => s.id === data.servicio);
-      const fechaConfirmada = new Date(data.dia + 'T00:00:00');
-      document.getElementById('confirm-nombre').textContent = data.nombre;
-      document.getElementById('confirm-barbero').textContent = barberoElegido ? barberoElegido.nombre : data.barbero;
-      document.getElementById('confirm-servicio').textContent = servicioElegidoReserva ? servicioElegidoReserva.nombre : data.servicio;
-      document.getElementById('confirm-fecha').textContent = fechaConfirmada.toLocaleDateString('es-AR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
-      document.getElementById('confirm-horario').textContent = data.horario + ' hs';
+      // Armar el link de WhatsApp dinámico
+      const textoMensaje = encodeURIComponent(`Hola! Acabo de sacar un turno desde la web a nombre de ${nombreCliente} para el día ${diaElegido} a las ${horaElegida} hs.`);
+      document.getElementById('btn-wa-link').href = `https://wa.me/${NUMERO_WHATSAPP_BOT}?text=${textoMensaje}`;
 
       form.reset();
       horarioPick.innerHTML = '<span class="time-empty">Elegí un día primero</span>';
