@@ -213,6 +213,13 @@
       </label>
     </fieldset>
 
+    <fieldset class="campo-reserva">
+      <label class="check-consentimiento">
+        <input type="checkbox" id="acepta-fidelidad-whatsapp">
+        <span>Quiero recibir por WhatsApp avisos sobre los beneficios que consiga con mi tarjeta de fidelidad. Es opcional. Puedo dejar de recibir mensajes respondiendo BAJA.</span>
+      </label>
+    </fieldset>
+
     <button type="submit" class="btn btn-primary campo-reserva">Confirmar reserva</button>
     <div id="status" class="campo-reserva"></div>
   </form>
@@ -453,6 +460,7 @@
       nombre: nombreCliente,
       whatsapp: document.getElementById('whatsapp').value,
       aceptaWhatsapp: document.getElementById('acepta-whatsapp').checked,
+      aceptaFidelidadWhatsapp: document.getElementById('acepta-fidelidad-whatsapp').checked,
       barbero: form.barbero.value,
       servicio: servicioSel.value,
       dia: diaElegido,
