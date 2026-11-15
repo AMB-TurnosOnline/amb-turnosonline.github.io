@@ -209,14 +209,7 @@
     <fieldset class="campo-reserva">
       <label class="check-consentimiento">
         <input type="checkbox" id="acepta-whatsapp" required>
-        <span>Confirmo que este número de WhatsApp es mío y acepto que AMB Barbers me escriba por WhatsApp sobre mi turno (confirmación y recordatorio). Puedo dejar de recibirlos cuando quiera respondiendo BAJA. <a href="privacidad.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Política de privacidad</a></span>
-      </label>
-    </fieldset>
-
-    <fieldset class="campo-reserva">
-      <label class="check-consentimiento">
-        <input type="checkbox" id="acepta-fidelidad-whatsapp">
-        <span>Quiero recibir por WhatsApp avisos sobre los beneficios que consiga con mi tarjeta de fidelidad. Es opcional. Puedo dejar de recibir mensajes respondiendo BAJA.</span>
+        <span>Confirmo que este número de WhatsApp es mío y autorizo a AMB Barbers a enviarme por WhatsApp la confirmación de mi turno, recordatorios y avisos sobre mi tarjeta de fidelidad y sus beneficios. Puedo dejar de recibir mensajes automáticos cuando quiera respondiendo BAJA. <a href="privacidad.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Política de privacidad</a></span>
       </label>
     </fieldset>
 
@@ -460,7 +453,6 @@
       nombre: nombreCliente,
       whatsapp: document.getElementById('whatsapp').value,
       aceptaWhatsapp: document.getElementById('acepta-whatsapp').checked,
-      aceptaFidelidadWhatsapp: document.getElementById('acepta-fidelidad-whatsapp').checked,
       barbero: form.barbero.value,
       servicio: servicioSel.value,
       dia: diaElegido,
