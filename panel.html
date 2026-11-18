@@ -384,7 +384,7 @@
     document.getElementById('dash-error').style.display = 'none';
 
     try {
-      const res = await fetch(`${TURNOS_URL}?key=${encodeURIComponent(key)}`);
+      const res = await fetch(TURNOS_URL, { headers: { 'X-Panel-Key': key } });
       if (res.status === 401) {
         sessionStorage.removeItem(KEY_STORAGE);
         loginGate.style.display = 'block';
@@ -432,7 +432,8 @@
 
   async function confirmarCorte(id, nuevoEstado) {
     try {
-      const res = await fetch(`${TURNOS_URL}/${id}/completar?key=${encodeURIComponent(currentKey)}`, {
+      const res = await fetch(`${TURNOS_URL}/${id}/completar`, {
+        headers: { 'X-Panel-Key': currentKey },
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ completado: nuevoEstado }),
@@ -449,7 +450,7 @@
   async function borrarTurno(id, filaEl) {
     if (!confirm('¿Borrar este turno? No se puede deshacer.')) return;
     try {
-      const res = await fetch(`${TURNOS_URL}/${id}?key=${encodeURIComponent(currentKey)}`, { method: 'DELETE' });
+      const res = await fetch(`${TURNOS_URL}/${id}`, { method: 'DELETE', headers: { 'X-Panel-Key': currentKey } });
       if (!res.ok) throw new Error('No se pudo borrar');
       // Recargamos todo el panel (no solo sacar la fila) para que Clientes,
       // la tarjeta de fidelidad, la caja y las estadísticas se actualicen
@@ -852,7 +853,7 @@
 
   async function cargarMensajes() {
     try {
-      const res = await fetch(`${MENSAJES_URL}?key=${encodeURIComponent(currentKey)}`);
+      const res = await fetch(MENSAJES_URL, { headers: { 'X-Panel-Key': currentKey } });
       if (!res.ok) return;
       const mensajes = await res.json();
       renderMensajes(mensajes);
@@ -916,7 +917,7 @@
 
   async function cargarBloqueos() {
     try {
-      const res = await fetch(`${BLOQUEOS_URL}?key=${encodeURIComponent(currentKey)}`);
+      const res = await fetch(BLOQUEOS_URL, { headers: { 'X-Panel-Key': currentKey } });
       if (!res.ok) return;
       const bloqueos = await res.json();
       renderBloqueos(bloqueos);
@@ -957,7 +958,7 @@
       item.querySelector('.btn-delete-block').addEventListener('click', async () => {
         if (!confirm('¿Quitar este bloqueo?')) return;
         try {
-          const res = await fetch(`${BLOQUEOS_URL}/${grupoId}?key=${encodeURIComponent(currentKey)}`, { method: 'DELETE' });
+          const res = await fetch(`${BLOQUEOS_URL}/${grupoId}`, { method: 'DELETE', headers: { 'X-Panel-Key': currentKey } });
           if (!res.ok) throw new Error();
           item.remove();
         } catch (e) {
@@ -973,7 +974,8 @@
     blockMsg.textContent = 'Bloqueando...';
     blockMsg.style.color = 'var(--fg-dim)';
     try {
-      const res = await fetch(`${BLOQUEOS_URL}?key=${encodeURIComponent(currentKey)}`, {
+      const res = await fetch(BLOQUEOS_URL, {
+          headers: { 'X-Panel-Key': currentKey },
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
