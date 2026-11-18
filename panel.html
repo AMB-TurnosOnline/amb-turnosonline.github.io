@@ -197,6 +197,12 @@
   .msg-tag.pendiente{border-color:#d9b36a;color:#d9b36a}
   .msg-tag.fallido{border-color:#d98a7a;color:#d98a7a}
   .msgs-empty{color:var(--fg-dim);font-size:13px;padding:10px 0}
+  .optout-form{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+  .optout-form label{display:block;font-size:13px;margin-bottom:8px}
+  .optout-controls{display:flex;gap:8px;flex-wrap:wrap}
+  .optout-controls input{flex:1;min-width:210px;padding:11px;border:1px solid var(--line-strong);border-radius:var(--radius);background:var(--panel);color:var(--fg)}
+  .optout-controls button{padding:11px 16px;border:0;border-radius:var(--radius);background:var(--fg);color:var(--bg);font-weight:600;cursor:pointer}
+
 
   /* bloqueos */
   .block-section{border:1px solid var(--line);border-radius:var(--radius);padding:22px 20px;margin-bottom:40px}
@@ -265,6 +271,14 @@
     <h3>Mensajes enviados</h3>
     <p class="sub">Como el número usa la API oficial de WhatsApp, no hay ningún WhatsApp normal donde ver esto — acá queda el registro de cada mensaje que mandó el bot.</p>
     <div class="msgs-list" id="msgs-list"></div>
+    <form id="optout-form" class="optout-form">
+      <label for="optout-number">Registrar una baja solicitada fuera de WhatsApp</label>
+      <div class="optout-controls">
+        <input type="tel" id="optout-number" placeholder="Número de WhatsApp con código de país" required>
+        <button type="submit">Registrar BAJA</button>
+      </div>
+      <p id="optout-status" class="sub" role="status">Usalo si el cliente pidió no recibir mensajes por teléfono, Instagram o en el local.</p>
+    </form>
   </div>
 
   <div class="caja-section" id="caja-section" style="display:none">
@@ -364,6 +378,7 @@
   const TURNOS_URL = API_URL.replace('/api/reservar', '/api/turnos');
   const BLOQUEOS_URL = API_URL.replace('/api/reservar', '/api/bloqueos');
   const MENSAJES_URL = API_URL.replace('/api/reservar', '/api/mensajes');
+  const OPT_OUT_URL = API_URL.replace('/api/reservar', '/api/optout');
   const KEY_STORAGE = 'amb_panel_key';
 
   const loginGate = document.getElementById('login-gate');
@@ -991,6 +1006,26 @@
     } catch (e) {
       blockMsg.textContent = e.message || 'No se pudo bloquear ese horario.';
       blockMsg.style.color = '#d98a7a';
+    }
+  });
+
+  document.getElementById('optout-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = document.getElementById('optout-number');
+    const status = document.getElementById('optout-status');
+    status.textContent = 'Registrando baja...';
+    try {
+      const res = await fetch(OPT_OUT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Panel-Key': currentKey },
+        body: JSON.stringify({ whatsapp: input.value.trim() }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'No se pudo registrar la baja.');
+      input.value = '';
+      status.textContent = '✓ Baja registrada. El bot no volverá a enviar mensajes a ese número hasta que el cliente reactive el consentimiento.';
+    } catch (err) {
+      status.textContent = err.message || 'No se pudo registrar la baja.';
     }
   });
 
