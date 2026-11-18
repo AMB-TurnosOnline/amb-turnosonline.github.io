@@ -433,9 +433,8 @@
   async function confirmarCorte(id, nuevoEstado) {
     try {
       const res = await fetch(`${TURNOS_URL}/${id}/completar`, {
-        headers: { 'X-Panel-Key': currentKey },
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Panel-Key': currentKey },
         body: JSON.stringify({ completado: nuevoEstado }),
       });
       if (!res.ok) throw new Error('No se pudo actualizar');
@@ -975,9 +974,8 @@
     blockMsg.style.color = 'var(--fg-dim)';
     try {
       const res = await fetch(BLOQUEOS_URL, {
-          headers: { 'X-Panel-Key': currentKey },
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Panel-Key': currentKey },
         body: JSON.stringify({
           dia: blockDia.value,
           barbero: document.getElementById('block-barbero').value,
