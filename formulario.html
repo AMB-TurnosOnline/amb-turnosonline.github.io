@@ -135,6 +135,9 @@
     background-color: #25D366; color: #000; font-weight: 600; width: 100%;
     padding: 14px; border-radius: var(--radius); text-decoration: none; margin-top: 18px;
   }
+  .confirm-details{margin:18px 0 22px;padding:16px;border:1px solid var(--line);border-radius:var(--radius);text-align:left}
+  .confirm-details p{margin:7px 0;color:var(--fg-dim);font-size:14px}
+  .confirm-details strong{color:var(--fg)}
   .confirm-card .btn-secondary{width:100%;margin-top:10px;border:0;cursor:pointer;font-family:inherit;font-size:14px;background:transparent;color:var(--fg-dim)}
   [hidden]{display:none !important}
   .ayuda-campo{display:block;margin-top:6px;color:var(--fg-dim);font-size:12px}
@@ -162,7 +165,7 @@
 <div class="form-shell">
   <div class="eyebrow">Reserva online</div>
   <h1>Reservá tu turno</h1>
-  <p style="color:var(--fg-dim);margin-bottom:36px">Completá tus datos y te confirmamos por WhatsApp al instante, sin esperas.</p>
+  <p style="color:var(--fg-dim);margin-bottom:36px">Completá tus datos y confirmá tu turno. El resultado aparecerá directamente en esta página.</p>
 
   <form id="reserva-form" class="glass form-panel">
     <fieldset>
@@ -251,21 +254,21 @@
         <path d="M4 12.5L9.5 18L20 6" stroke="#f2ede2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <h2>¡Casi listo!</h2>
-    <p>Para asegurar tu lugar, tocá el botón para enviar tu confirmación por WhatsApp.</p>
-    
-    <a href="#" id="btn-wa-link" target="_blank" class="btn-whatsapp-confirm">
-      Confirmar por WhatsApp 💬
-    </a>
+    <h2>¡Turno confirmado!</h2>
+    <p>Tu reserva quedó registrada correctamente. Estos son los datos de tu turno:</p>
+    <div class="confirm-details">
+      <p><strong>Nombre:</strong> <span id="confirm-nombre"></span></p>
+      <p><strong>Barbero:</strong> <span id="confirm-barbero"></span></p>
+      <p><strong>Servicio:</strong> <span id="confirm-servicio"></span></p>
+      <p><strong>Día:</strong> <span id="confirm-dia"></span></p>
+      <p><strong>Hora:</strong> <span id="confirm-hora"></span></p>
+    </div>
     <button type="button" class="btn-secondary" id="confirm-close">Cerrar ventana</button>
   </div>
 </div>
 
 <script src="data.js"></script>
 <script>
-  // Número oficial del bot para abrir el chat
-  const NUMERO_WHATSAPP_BOT = "5492646086703";
-
   // Barberos
   const FOTOS_BARBEROS = {
     sebastian: 'assets/barbero-sebastian.jpeg',
@@ -472,9 +475,13 @@
       status.className='';
       status.textContent='';
       
-      // Armar el link de WhatsApp dinámico
-      const textoMensaje = encodeURIComponent(`Hola! Acabo de sacar un turno desde la web a nombre de ${nombreCliente} para el día ${diaElegido} a las ${horaElegida} hs.`);
-      document.getElementById('btn-wa-link').href = `https://wa.me/${NUMERO_WHATSAPP_BOT}?text=${textoMensaje}`;
+      const barberoElegido = BARBEROS.find(b => b.id === data.barbero);
+      const servicioElegidoInfo = SERVICIOS.find(s => s.id === data.servicio);
+      document.getElementById('confirm-nombre').textContent = nombreCliente;
+      document.getElementById('confirm-barbero').textContent = barberoElegido ? barberoElegido.nombre : data.barbero;
+      document.getElementById('confirm-servicio').textContent = servicioElegidoInfo ? servicioElegidoInfo.nombre : data.servicio;
+      document.getElementById('confirm-dia').textContent = new Date(diaElegido + 'T00:00:00').toLocaleDateString('es-AR');
+      document.getElementById('confirm-hora').textContent = horaElegida + ' hs';
 
       form.reset();
       horarioPick.innerHTML = '<span class="time-empty">Elegí un día primero</span>';
