@@ -162,7 +162,7 @@
 <div class="form-shell">
   <div class="eyebrow">Reserva online</div>
   <h1>Reservá tu turno</h1>
-  <p style="color:var(--fg-dim);margin-bottom:36px">Elegí tu servicio, barbero, día y horario. La reserva queda registrada y se confirma en esta página. Durante esta pausa no enviamos mensajes por WhatsApp.</p>
+  <p style="color:var(--fg-dim);margin-bottom:36px">Completá tus datos y te confirmamos por WhatsApp al instante, sin esperas.</p>
 
   <form id="reserva-form" class="glass form-panel">
     <fieldset>
@@ -173,7 +173,7 @@
     <fieldset class="campo-reserva">
       <label for="whatsapp">Tu WhatsApp</label>
       <input type="tel" id="whatsapp" name="whatsapp" required placeholder="264 xxx xxxx">
-      <small class="ayuda-campo">Ingresá un teléfono de contacto para identificar tu reserva. No enviaremos mensajes por WhatsApp durante esta pausa.</small>
+      <small class="ayuda-campo">Usá tu propio número: es el que va a recibir la confirmación del turno.</small>
     </fieldset>
 
     <fieldset class="campo-reserva">
@@ -203,13 +203,13 @@
 
     <div id="consulta-panel" class="consulta-panel" hidden>
       <p>Este servicio dura unas <b>4 horas</b> y el barbero primero charla con vos para definir qué te vas a hacer. Por eso <b>se coordina directo por WhatsApp</b>, sin reservar acá.</p>
-      <a class="btn btn-primary" href="https://www.instagram.com/amb_barbers/" target="_blank" rel="noopener">Consultar por Instagram</a>
+      <a id="consulta-btn" class="btn btn-primary" href="#" target="_blank" rel="noopener">Hablar por WhatsApp</a>
     </div>
 
     <fieldset class="campo-reserva">
       <label class="check-consentimiento">
-        
-        <span>La reserva se confirma en esta página. No necesitás aceptar mensajes de WhatsApp para sacar turno.</span>
+        <input type="checkbox" id="acepta-whatsapp" required>
+        <span>Confirmo que este número de WhatsApp es mío y acepto que AMB Barbers me escriba por WhatsApp sobre mi turno (confirmación y recordatorio). Puedo dejar de recibirlos cuando quiera respondiendo BAJA. <a href="privacidad.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Política de privacidad</a></span>
       </label>
     </fieldset>
 
@@ -252,9 +252,11 @@
       </svg>
     </div>
     <h2>¡Casi listo!</h2>
-    <p>Tu turno quedó registrado correctamente. No hace falta enviar ningún mensaje por WhatsApp.</p>
+    <p>Para asegurar tu lugar, tocá el botón para enviar tu confirmación por WhatsApp.</p>
     
-    
+    <a href="#" id="btn-wa-link" target="_blank" class="btn-whatsapp-confirm">
+      Confirmar por WhatsApp 💬
+    </a>
     <button type="button" class="btn-secondary" id="confirm-close">Cerrar ventana</button>
   </div>
 </div>
@@ -262,7 +264,7 @@
 <script src="data.js"></script>
 <script>
   // Número oficial del bot para abrir el chat
-  
+  const NUMERO_WHATSAPP_BOT = "5492646086703";
 
   // Barberos
   const FOTOS_BARBEROS = {
@@ -307,16 +309,29 @@
   // Servicios que se coordinan por WhatsApp (consulta: true en data.js):
   // en vez de reservar, se esconden día/horario/barbero y aparece el botón al chat.
   const consultaPanel = document.getElementById('consulta-panel');
+  const consultaBtn = document.getElementById('consulta-btn');
+  const nombreInput = document.getElementById('nombre');
+
   function servicioElegido() {
     return SERVICIOS.find(x => x.id === servicioSel.value);
+  }
+  function armarLinkConsulta() {
+    const s = servicioElegido();
+    if (!s || !s.consulta) return;
+    const nombre = nombreInput.value.trim();
+    const texto = `Hola! ${nombre ? 'Soy ' + nombre + '. ' : ''}Quiero consultar por *${s.nombre}* (${s.precio}). ¿Cuándo podemos coordinar?`;
+    consultaBtn.href = `https://wa.me/${WHATSAPP_BARBERIA}?text=${encodeURIComponent(texto)}`;
   }
   function actualizarModoServicio() {
     const s = servicioElegido();
     const esConsulta = !!(s && s.consulta);
+    // fieldset/botón deshabilitados no entran en la validación del formulario
     form.querySelectorAll('.campo-reserva').forEach(el => { el.hidden = esConsulta; el.disabled = esConsulta; });
     consultaPanel.hidden = !esConsulta;
+    armarLinkConsulta();
   }
   servicioSel.addEventListener('change', actualizarModoServicio);
+  nombreInput.addEventListener('input', armarLinkConsulta);
 
   const diaInput = document.getElementById('dia');
   const horarioInput = document.getElementById('horario');
@@ -437,7 +452,7 @@
     const data = {
       nombre: nombreCliente,
       whatsapp: document.getElementById('whatsapp').value,
-      aceptaWhatsapp: false,
+      aceptaWhatsapp: document.getElementById('acepta-whatsapp').checked,
       barbero: form.barbero.value,
       servicio: servicioSel.value,
       dia: diaElegido,
@@ -457,12 +472,16 @@
       status.className='';
       status.textContent='';
       
+      // Armar el link de WhatsApp dinámico
+      const textoMensaje = encodeURIComponent(`Hola! Acabo de sacar un turno desde la web a nombre de ${nombreCliente} para el día ${diaElegido} a las ${horaElegida} hs.`);
+      document.getElementById('btn-wa-link').href = `https://wa.me/${NUMERO_WHATSAPP_BOT}?text=${textoMensaje}`;
+
       form.reset();
       horarioPick.innerHTML = '<span class="time-empty">Elegí un día primero</span>';
       document.getElementById('confirm-overlay').classList.add('show');
     } catch (err) {
       status.className='err';
-      status.textContent = err.message || 'Hubo un problema al enviar la reserva. Revisá los datos e intentá nuevamente.';
+      status.textContent = err.message || 'Hubo un problema al enviar la reserva. Probá de nuevo o escribinos por WhatsApp.';
       if (res && res.status === 409) actualizarHorarios();
     }
   });
