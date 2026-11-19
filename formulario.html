@@ -472,7 +472,6 @@
       // Armar el link de WhatsApp dinámico
       const textoMensaje = encodeURIComponent(`Hola! Acabo de sacar un turno desde la web a nombre de ${nombreCliente} para el día ${diaElegido} a las ${horaElegida} hs.`);
       document.getElementById('btn-wa-link').href = `https://wa.me/${NUMERO_WHATSAPP_BOT}?text=${textoMensaje}`;
-      document.getElementById('confirm-horario').textContent = `${horaElegida} hs`;
 
       form.reset();
       horarioPick.innerHTML = '<span class="time-empty">Elegí un día primero</span>';
