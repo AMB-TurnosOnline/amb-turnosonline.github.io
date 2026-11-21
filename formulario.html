@@ -144,6 +144,9 @@
   .consulta-panel p{color:var(--fg-dim);font-size:14px;line-height:1.6;margin:0 0 16px}
   .consulta-panel p b{color:var(--fg)}
   .consulta-panel .btn{display:block;text-align:center;text-decoration:none}
+  .consent-warning .confirm-card{max-width:430px}
+  .consent-warning .btn-secondary{background:var(--panel-2);border:1px solid var(--line-strong)}
+  .consent-warning .btn-continue{color:var(--fg-dim)}
 </style>
 </head>
 <body>
@@ -240,6 +243,15 @@
       Seguinos en Instagram
     </a>
     <a class="btn btn-outline" href="index.html">Volver al inicio</a>
+  </div>
+</div>
+
+<div class="confirm-overlay consent-warning" id="consent-warning" role="dialog" aria-modal="true" aria-labelledby="consent-warning-title">
+  <div class="confirm-card">
+    <h2 id="consent-warning-title">¿Continuar sin WhatsApp?</h2>
+    <p>Si no aceptás el consentimiento, tu reserva quedará registrada en la página, pero no podremos enviarte la confirmación ni el recordatorio por WhatsApp.</p>
+    <button type="button" class="btn btn-primary" id="consent-back">Volver y aceptar</button>
+    <button type="button" class="btn-secondary btn-continue" id="consent-continue">Continuar sin WhatsApp</button>
   </div>
 </div>
 
@@ -431,8 +443,17 @@
   const form = document.getElementById('reserva-form');
   const status = document.getElementById('status');
 
+  const aceptaWhatsappInput = document.getElementById('acepta-whatsapp');
+  const consentWarning = document.getElementById('consent-warning');
+  let confirmoSinWhatsapp = false;
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    if (!aceptaWhatsappInput.checked && !confirmoSinWhatsapp) {
+      consentWarning.classList.add('show');
+      return;
+    }
 
     if (!horarioInput.value) {
       status.className='err';
@@ -449,7 +470,7 @@
     const data = {
       nombre: nombreCliente,
       whatsapp: document.getElementById('whatsapp').value,
-      aceptaWhatsapp: document.getElementById('acepta-whatsapp').checked,
+      aceptaWhatsapp: aceptaWhatsappInput.checked,
       barbero: form.barbero.value,
       servicio: servicioSel.value,
       dia: diaElegido,
@@ -474,6 +495,7 @@
       document.getElementById('btn-wa-link').href = `https://wa.me/${NUMERO_WHATSAPP_BOT}?text=${textoMensaje}`;
 
       form.reset();
+      confirmoSinWhatsapp = false;
       horarioPick.innerHTML = '<span class="time-empty">Elegí un día primero</span>';
       document.getElementById('confirm-overlay').classList.add('show');
     } catch (err) {
@@ -481,6 +503,20 @@
       status.textContent = err.message || 'Hubo un problema al enviar la reserva. Probá de nuevo o escribinos por WhatsApp.';
       if (res && res.status === 409) actualizarHorarios();
     }
+  });
+
+  document.getElementById('consent-back').addEventListener('click', () => {
+    consentWarning.classList.remove('show');
+    aceptaWhatsappInput.checked = true;
+    aceptaWhatsappInput.focus();
+  });
+  document.getElementById('consent-continue').addEventListener('click', () => {
+    consentWarning.classList.remove('show');
+    confirmoSinWhatsapp = true;
+    form.requestSubmit();
+  });
+  consentWarning.addEventListener('click', (e) => {
+    if (e.target === consentWarning) consentWarning.classList.remove('show');
   });
 
   const confirmOverlay = document.getElementById('confirm-overlay');
