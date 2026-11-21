@@ -196,6 +196,9 @@
   .msg-tag.enviado{border-color:#8fbf7a;color:#8fbf7a}
   .msg-tag.pendiente{border-color:#d9b36a;color:#d9b36a}
   .msg-tag.fallido{border-color:#d98a7a;color:#d98a7a}
+  .turno-consentimiento{display:block;margin-top:5px;font-size:11px;line-height:1.4}
+  .turno-consentimiento.aceptado{color:#8fbf7a}
+  .turno-consentimiento.sin-consentimiento{color:#d9b36a}
   .msgs-empty{color:var(--fg-dim);font-size:13px;padding:10px 0}
   .optout-form{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
   .optout-form label{display:block;font-size:13px;margin-bottom:8px}
@@ -802,6 +805,7 @@
                 <span class="hora">${t.horario}</span>
                 <span class="who">${t.nombre}</span>
                 <span class="detail">${t.barbero} · ${t.servicio}</span>
+                <span class="turno-consentimiento ${t.consentimientoWhatsapp?.aceptado === true ? 'aceptado' : 'sin-consentimiento'}">${t.consentimientoWhatsapp?.aceptado === true ? '✓ Reserva web · Aceptó WhatsApp' : '⚠ Reserva web · Sin consentimiento (no enviar WhatsApp)'}</span>
                 <span class="precio">${t.precio || ''}</span>
               </div>
               <div class="turno-acciones">
